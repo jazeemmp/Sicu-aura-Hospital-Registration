@@ -19,8 +19,11 @@ const hospitalRoutes = require('./routes/hospitalRoutes')
 
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:5173', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.urlencoded({ extended: false }));
 
 // Use hospital routes under /api
