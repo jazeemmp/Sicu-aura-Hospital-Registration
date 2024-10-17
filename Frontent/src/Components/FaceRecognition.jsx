@@ -2,8 +2,10 @@ import React, { useRef, useState } from "react";
 import Icon from "@mdi/react";
 import { mdiCamera } from "@mdi/js";
 import Webcam from "react-webcam";
+import { useNavigate } from "react-router-dom";
 
 const FaceRecognition = () => {
+  const navigate = useNavigate();
   const [image, setImage] = useState(null);
   const [cameraAllowed, setCameraAllowed] = useState(true);
   const webcamRef = useRef(null);
@@ -60,7 +62,10 @@ const FaceRecognition = () => {
           >
             Re-take
           </button>
-          <button className="rounded-xl py-2 mt-10 font-semibold text-lg px-8 text-white bg-[#261E3B]">
+          <button
+            onClick={() => navigate("/")}
+            className="rounded-xl py-2 mt-10 font-semibold text-lg px-8 text-white bg-[#261E3B]"
+          >
             Continue
           </button>
         </div>

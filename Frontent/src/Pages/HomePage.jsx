@@ -1,36 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import NavBar from "../Components/NavBar";
 import { OcticonFilter16, FeSearch } from "../assets/icons";
 import DropdownButton from "../Components/DropDownButton";
-
+import axios from "../Axios/authAxios";
+import { formatDate } from "../assets/formatDate";
 const HomePage = () => {
   const [showMenu, setShowMenu] = useState(false);
-  const registrations = [
-    {
-      id: 1,
-      date: "01.01.2000, 12:00 am",
-      hospital: "ABC Hospital",
-      email: "alexrobinson001@gmail.com",
-      address: "ABC Road, Park Colony paalarivattam poonad poovanchri",
-      phone: "9876543210",
-      city: "Kolkata",
-      state: "West Bengal",
-      pincode: "700001",
-      active: false,
-    },
-    {
-      id: 2,
-      date: "01.01.2000, 12:00 am",
-      hospital: "ABC Hospital",
-      email: "alexrobinson001@gmail.com",
-      address: "ABC Road, Park Colony",
-      phone: "9876543210",
-      city: "Kolkata",
-      state: "Chhattisgarh",
-      pincode: "700001",
-      active: true,
-    },
-  ];
+  const [hospitals, setHospitals] = useState([]);
+  const [filteredHospitals, setFilteredHospitals] = useState([]);
+
+  const fetchData = async () => {
+    const { data } = await axios.get("/hospitals");
+    setHospitals(data);
+  };
+
+  const filterHospitals = (e) => {
+    const prompt = e.target.value; // Get the current input value
+    if (prompt === "") {
+       setFilteredHospitals(hospitals)
+    } else {
+      const filteredHospitals = hospitals.filter((hospital) => {
+        return (
+          hospital.email.toLowerCase().includes(prompt.toLowerCase()) || // Check if email includes the prompt
+          hospital.name.toLowerCase().includes(prompt.toLowerCase()) // Check if name includes the prompt
+        );
+      });
+
+      setFilteredHospitals(filteredHospitals);
+    }
+  };
+  const sortByDate = ()=>{
+    const sortedData = hospitals.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    setFilteredHospitals(sortedData)
+  }
+  const sortlist = (prompt) => {
+    const status = prompt == "Inactive" ? true : false;
+    const data = hospitals.filter((hospital) => hospital.inactive === status);
+    setFilteredHospitals(data);
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+  const openImageInNewTab = (name) => {
+    const imageURL = `/uploads/${name}`;
+    window.open(imageURL, "_blank");
+  };
   return (
     <div className="bg-[#F3FAFF]">
       <NavBar />
@@ -39,7 +53,7 @@ const HomePage = () => {
         <div className="flex justify-between">
           <div>
             <h1 className="text-[32px] font-normal text-[#404040]">
-              Hospital Registrations
+              Hospital datas
             </h1>
           </div>
           <div className="flex items-center gap-8 relative">
@@ -47,7 +61,8 @@ const HomePage = () => {
               <input
                 type="text"
                 placeholder="Search"
-                className="bg-transparent outline-none border-none"
+                onChange={filterHospitals}
+                className="bg-transparent w-full outline-none border-none"
               />
               <FeSearch style={{ width: "28.8px", height: "28.8px" }} />
             </div>
@@ -60,11 +75,11 @@ const HomePage = () => {
             {showMenu && (
               <div
                 style={{ right: "-70px" }}
-                className="absolute  top-10 w-[102px] h-[117px] bg-white rounded-md flex flex-col text-base text-[#909090] items-center justify-center"
+                className="absolute cursor-pointer  top-10 w-[102px] h-[117px] bg-white rounded-md flex flex-col text-base text-[#909090] items-center justify-center"
               >
-                <p>Date</p>
-                <p>Active</p>
-                <p>Inactive</p>
+                <p onClick={sortByDate}>Date</p>
+                <p onClick={() => sortlist("Active")}>Active</p>
+                <p onClick={() => sortlist("Inactive")}>Inactive</p>
               </div>
             )}
           </div>
@@ -82,38 +97,42 @@ const HomePage = () => {
               <p className="w-[80px] text-center">State</p>
               <p className="w-[80px] text-center">Pincode</p>
             </div>
-            {registrations.map((registration, index) => (
-              <div
-                key={registration.id}
-                className={`flex items-center font-medium justify-evenly text-xs rounded-3xl py-3 ${
-                  index % 2 == 0 ? "bg-white" : "bg-[#f5f5f5]"
-                }`}
-              >
-                <div className="w-[40px] text-center">{index + 1}</div>
-                <div className="w-[120px] text-center">{registration.date}</div>
-                <div className="w-[180px] truncate text-center">
-                  {registration.hospital}
+            <div>
+              {(filteredHospitals.length > 0
+                ? filteredHospitals
+                : hospitals
+              ).map((data, index) => (
+                <div
+                  key={data.id}
+                  className={`flex items-center font-medium justify-evenly text-xs rounded-3xl py-3 ${
+                    index % 2 === 0 ? "bg-white" : "bg-[#f5f5f5]"
+                  }`}
+                >
+                  <div className="w-[40px] text-center">{index + 1}</div>
+                  <div className="w-[120px] text-center">
+                    {formatDate(data.createdAt)}
+                  </div>
+                  <div className="w-[180px] truncate text-center">
+                    {data.name}
+                  </div>
+                  <div className="w-[180px] truncate text-center">
+                    {data.email}
+                  </div>
+                  <div className="w-[100px] truncate text-center">
+                    {data.address}
+                  </div>
+                  <div className="w-[120px] text-center">{data.phone}</div>
+                  <div className="w-[100px] text-center">{data.city}</div>
+                  <div className="w-[80px] text-center">{data.state}</div>
+                  <div className="w-[80px] text-center">{data.pincode}</div>
                 </div>
-                <div className="w-[180px] truncate text-center">
-                  {registration.email}
-                </div>
-                <div className="w-[100px] truncate text-center">
-                  {registration.address}
-                </div>
-                <div className="w-[120px] text-center">
-                  {registration.phone}
-                </div>
-                <div className="w-[100px] text-center">{registration.city}</div>
-                <div className="w-[80px] text-center">{registration.state}</div>
-                <div className="w-[80px] text-center">
-                  {registration.pincode}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            {/* As per design  */}
             {Array.from({ length: 20 }, (_, index) => (
               <div
-                className={`flex items-center font-medium relative justify-evenly text-xs w-full rounded-3xl py-3 ${
-                  index % 2 === 0 ? "bg-white" : "bg-[#f5f5f5]"
+                className={`flex h-[40px] items-center font-medium relative justify-evenly text-xs w-full rounded-3xl py-3 ${
+                  index % 2 === 1 ? "bg-white" : "bg-[#f5f5f5]"
                 }`}
               ></div>
             ))}
@@ -131,43 +150,53 @@ const HomePage = () => {
                   Hospital Registration Photo
                 </p>
                 <p className="w-[220px] text-center">Emergency-Ward Number</p>
+                <p>Number of Ambulance</p>
               </div>
               <div className="mx-5 text-base font-medium text-center">
                 staus
               </div>
             </div>
-            {registrations.map((registration, index) => (
-              <div
-                key={registration.id}
-                className={`flex items-center font-medium relative justify-evenly text-xs w-full rounded-3xl py-3 ${
-                  index % 2 === 0 ? "bg-white" : "bg-[#f5f5f5]"
-                }`}
-              >
-                <div className="w-[120px] text-center">{registration.date}</div>
-                <div className="w-[180px] truncate text-center">
-                  {registration.email}
+            {(filteredHospitals.length > 0 ? filteredHospitals : hospitals).map(
+              (data, index) => (
+                <div
+                  key={data.id}
+                  className={`flex items-center font-medium relative justify-evenly text-xs w-full rounded-3xl py-3 ${
+                    index % 2 === 0 ? "bg-white" : "bg-[#f5f5f5]"
+                  }`}
+                >
+                  <div className="w-[120px] text-center">{data.date}</div>
+                  <div className="w-[180px] truncate text-center">
+                    {data.registerNum}
+                  </div>
+                  <div className="w-[180px] truncate text-center">
+                    <p
+                      className="cursor-pointer text-blue-600 font-medium"
+                      onClick={() => openImageInNewTab(data.certificate)}
+                    >
+                      File
+                    </p>
+                  </div>
+                  <div className="w-[180px] truncate text-center">
+                    {data.wardNum}
+                  </div>
+                  <div className="w-[180px] truncate text-center">
+                    {data.availability}
+                  </div>
+                  <div className="absolute right-0">
+                    <DropdownButton
+                      label={data.inactive ? "Inactive" : "Active"}
+                      id={data._id}
+                      fetchData={fetchData}
+                    />
+                  </div>
                 </div>
-                <div className="w-[180px] truncate text-center">
-                  <img
-                    src={registration.photo}
-                    alt="Hospital Registration"
-                    className="w-[50px] h-auto mx-auto"
-                  />
-                </div>
-                <div className="w-[180px] truncate text-center">
-                  {registration.emergencyWardNumber || "nkjxnckj"}
-                </div>
-                <div className="absolute right-0 ">
-                  <DropdownButton
-                    label={registration.active ? "Active" : "Inactive"}
-                  />
-                </div>
-              </div>
-            ))}
+              )
+            )}
+            {/* As per design  */}
             {Array.from({ length: 20 }, (_, index) => (
               <div
-                className={`flex items-center font-medium relative justify-evenly text-xs w-full rounded-3xl py-3 ${
-                  index % 2 === 0 ? "bg-white" : "bg-[#f5f5f5]"
+                className={`flex h-[40px] items-center font-medium relative justify-evenly text-xs w-full rounded-3xl py-3 ${
+                  index % 2 === 1 ? "bg-white" : "bg-[#f5f5f5]"
                 }`}
               ></div>
             ))}

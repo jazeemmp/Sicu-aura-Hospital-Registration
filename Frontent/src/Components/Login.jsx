@@ -1,10 +1,18 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import FaceRecognition from "./FaceRecognition";
 import loginValidation from "../Formik/LoginValidation";
-
+import axios from "../Axios/authAxios";
+import { toast } from "sonner";
 const Login = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/");
+    }
+  }, [navigate]);
   const [isLogined, setIsLogined] = useState(false);
   const formik = useFormik({
     initialValues: {
@@ -15,8 +23,16 @@ const Login = () => {
     },
     validationSchema: loginValidation,
     onSubmit: async (values) => {
-      
-    }
+      try {
+        const { data } = await axios.post("/login", values);
+        localStorage.setItem("token", data.token);
+        toast.success("Login Success");
+        setIsLogined(true);
+      } catch (error) {
+        console.log(error);
+        toast.error(error.response.data.message);
+      }
+    },
   });
   return (
     <div className="p-16 pb-3">
