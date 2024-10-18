@@ -94,7 +94,7 @@ const Login = () => {
                 </div>
                 <div className="mb-9">
                   <input
-                    type="text"
+                    type="password"
                     name="password"
                     className="w-full border-b-2  focus:border-black py-2 outline-none text-lg"
                     placeholder="Password"
