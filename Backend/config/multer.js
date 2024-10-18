@@ -1,12 +1,12 @@
 const multer = require("multer");
-const path = require("path");
 
+// Use /tmp directory for temporary storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../../Frontent/public/uploads"));
+    cb(null, '/tmp');  // Store files in the /tmp directory
   },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname)
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);  // Create a unique filename
   }
 });
 
