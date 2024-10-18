@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://backend-1xc8hq1w3-jazeemmps-projects.vercel.app',  // Your backend URL
+        target: 'https://sicu-aura-hospital-registration.onrender.com/',  // Your backend URL
         changeOrigin: true,  // Makes sure the host header is changed to the target URL
         secure: false,  // Set to true if you're using HTTPS, false if not
       }
