@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://sicu-aura-hospital-registration.onrender.com/',  // Your backend URL
+        target: 'https://sicu-aura-hospital-registration-production.up.railway.app/',  // Your backend URL
         changeOrigin: true,  // Makes sure the host header is changed to the target URL
         secure: false,  // Set to true if you're using HTTPS, false if not
       }
