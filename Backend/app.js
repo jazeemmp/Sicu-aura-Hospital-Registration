@@ -20,7 +20,7 @@ const hospitalRoutes = require('./routes/hospitalRoutes')
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());
 app.use(cors({
-    origin: 'https://sicu-aura-hospital-registration-3vdm.vercel.app',  // Allow your front-end
+    origin: 'https://sicu-aura-hospital-registration.vercel.app',  // Allow your front-end
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Allow necessary HTTP methods
     allowedHeaders: ['Content-Type', 'Authorization']  // Allow specific headers
   }));
